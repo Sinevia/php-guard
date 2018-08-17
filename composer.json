@@ -4,8 +4,8 @@
     "description": "PHP Authentication Solution for PHP",
     "keywords": [
         "Sinevia",
-        "Laravel",
-        "CMS"
+        "PHP",
+        "Guard"
     ],
     "homepage": "https://github.com/Sinevia/php-guard",
     "license": "proprietary",
@@ -18,7 +18,8 @@
         }
     ],
     "require": {
-        "php": "~5.6|~7.0"
+        "php": "~5.6|~7.0",
+        "sinevia/php-library-schemaless":"~0.0.3":
     },
     "require-dev": {
         "phpunit/phpunit": ">=5.4.3",

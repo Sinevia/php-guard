@@ -43,7 +43,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Sinevia\\Auth\\CmsServiceProvider"
+                "Sinevia\\Guard\\GuardServiceProvider"
             ]
         }
     },

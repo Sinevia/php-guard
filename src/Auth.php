@@ -205,7 +205,7 @@ class Auth {
         $form .= '    <a href="' . $this->linkPasswordRestore() . '">Forgot Password</a>';
         $form .= '  </div>';
         $form .= '  <div class="form-group">';
-        $form .= '    <a href="' . $this->linkRegister() . '?grd=register">Register</a>';
+        $form .= '    <a href="' . $this->linkRegister() . '">Register</a>';
         $form .= '  </div>';
         $form .= '  <input type="hidden" name="sid" value="' . session_id() . '">';
         $form .= '  <input type="hidden" name="tid" value="' . base64_encode(time()) . '">';

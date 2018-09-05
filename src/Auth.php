@@ -33,11 +33,15 @@ class Auth {
     function serve() {
         $isPost = (($_SERVER['REQUEST_METHOD'] ?? "")) == "POST" ? true : false;
         $command = $_REQUEST['grd'] ?? 'login';
+
         if ($command == 'confirm') {
             return $this->emailConfirmationProcess();
         }
         if ($command == 'register') {
             $error = $isPost ? $this->formRegisterProcess() : '';
+            if ($isPost AND trim($error) == "") {
+                return redirect($this->linkLogin());
+            }
             return $this->formRegister($error);
         }
         if ($command == 'login') {
@@ -131,12 +135,16 @@ class Auth {
         }
         if ($email == "") {
             $error = 'Email is required...';
+            return $error;
         } else if ($password == "") {
             $error = 'Password is required';
+            return $error;
         } else if ($email != $emailConfirm) {
             $error = 'Confirmation email DOES NOT match email';
+            return $error;
         } else if ($password != $passwordConfirm) {
             $error = 'Confirmation password DOES NOT match password';
+            return $error;
         }
         // END: Validate
         $token = \Sinevia\AuthenticationUtils::randomPassword(12, 'BCDF');
@@ -166,11 +174,9 @@ class Auth {
                     'Html' => $htmlMessage,
                         ], true);
 
-        var_dump($isSent);
-        dd($newEntry);
-
-
-        return $error;
+        if ($isSent == false) {
+            return 'Registration email failed to be sent';
+        }
     }
 
     function formLogin($error = '') {

@@ -37,15 +37,15 @@ class Auth {
             return $this->emailConfirmationProcess();
         }
         if ($command == 'register') {
-            $errors = $isPost ? $this->formRegisterProcess() : '';
-            return $this->formRegister($errors);
+            $error = $isPost ? $this->formRegisterProcess() : '';
+            return $this->formRegister($error);
         }
         if ($command == 'login') {
-            $errors = $isPost ? $this->formLoginProcess() : '';
-            if ($isPost AND empty($errors)) {
+            $error = $isPost ? $this->formLoginProcess() : '';
+            if ($isPost AND trim($error) == "") {
                 return redirect($this->loginSuccessfulRedirectUrl);
             }
-            return $this->formLogin($errors);
+            return $this->formLogin($error);
         }
     }
 
@@ -173,28 +173,12 @@ class Auth {
         return $error;
     }
 
-    function formLogin() {
+    function formLogin($error = '') {
         /* START: Data */
         $password = (isset($_POST['password']) == false) ? '' : trim($_POST['password']);
         $email = (isset($_POST['email']) == false) ? '' : trim($_POST['email']);
         $sid = (isset($_POST['sid']) == false) ? '' : trim($_POST['sid']);
-        $error = '';
         /* END: Data */
-
-        // START: Submit
-        if ($sid == session_id()) {
-            if ($email == "") {
-                $error = 'Email is required...';
-            } else if ($password == "") {
-                $error = 'Password is required';
-            }
-
-            if ($error == '') {
-                $_SESSION['is_logged'] = true;
-                redirect($this->loginSuccessfulRedirectUrl);
-            }
-        }
-        // END: Submit
 
         if ($error != '') {
             $error = '<h1 style="color:red;font-size:12px;">' . $error . '</h1>';

@@ -21,7 +21,7 @@ class Auth {
     }
 
     function serve() {
-        $isPost = $_SERVER['REQUEST_METHOD'] == "POST" ? true : false;
+        $isPost = (($_SERVER['REQUEST_METHOD']??"")) == "POST" ? true : false;
         $command = $_REQUEST['grd'] ?? 'login';
         if ($command == 'confirm') {
             return $this->emailConfirmationProcess();
@@ -60,7 +60,7 @@ class Auth {
 
         var_dump($code);
         // 2. Retrieve entities by search
-        $userTemp = \Sinevia\Schemaless::getEntities([
+        $userTemps = \Sinevia\Schemaless::getEntities([
                     'Type' => 'SnvGuardUserTemp',
                     'limitFrom' => 0,
                     'limitTo' => 1,
@@ -71,7 +71,36 @@ class Auth {
                     // Should returned entities contain also the attributes
                     'withAttributes' => true,
         ]);
-        var_dump($userTemp);
+
+        $userTemp = count($userTemps) > 0 ? $userTemps[0] : null;
+        
+        if (is_null($userTemp)) {
+            die('This link has expired. Please try again');
+        }
+        
+        $email = $userTemp['Attributes']['Email'];
+        
+    }
+
+    function formLoginProcess() {
+        /* START: Data */
+        $email = (isset($_POST['email']) == false) ? '' : trim($_POST['email']);
+        $password = (isset($_POST['password']) == false) ? '' : trim($_POST['password']);
+        $sid = (isset($_POST['sid']) == false) ? '' : trim($_POST['sid']);
+        /* END: Data */
+
+        // START: Validate
+        if ($sid != session_id()) {
+            return 'Security token mismatch or expired';
+        }
+        if ($email == "") {
+            $error = 'Email is required...';
+        } else if ($password == "") {
+            $error = 'Password is required';
+        }
+        // END: Validate
+
+        return $error;
     }
 
     function formRegisterProcess() {

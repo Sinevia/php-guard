@@ -6,6 +6,16 @@ class Auth {
 
     private $endpoint = '';
     private $commandName = 'grd';
+    private $loginSuccessfulRedirectUrl = null;
+
+    public function getLoginSuccessfulRedirectUrl() {
+        return $this->loginSuccessfulRedirectUrl;
+    }
+
+    public function setLoginSuccessfulRedirectUrl($loginSuccessfulRedirectUrl) {
+        $this->loginSuccessfulRedirectUrl = $loginSuccessfulRedirectUrl;
+        return $this;
+    }
 
     function __construct() {
         $this->endpoint = $_SERVER['PHP_SELF'];
@@ -21,7 +31,7 @@ class Auth {
     }
 
     function serve() {
-        $isPost = (($_SERVER['REQUEST_METHOD']??"")) == "POST" ? true : false;
+        $isPost = (($_SERVER['REQUEST_METHOD'] ?? "")) == "POST" ? true : false;
         $command = $_REQUEST['grd'] ?? 'login';
         if ($command == 'confirm') {
             return $this->emailConfirmationProcess();
@@ -32,7 +42,10 @@ class Auth {
         }
         if ($command == 'login') {
             $errors = $isPost ? $this->formLoginProcess() : '';
-            return $this->formLogin();
+            if ($isPost AND empty($errors)) {
+                return redirect($this->loginSuccessfulRedirectUrl);
+            }
+            return $this->formLogin($errors);
         }
     }
 
@@ -73,13 +86,12 @@ class Auth {
         ]);
 
         $userTemp = count($userTemps) > 0 ? $userTemps[0] : null;
-        
+
         if (is_null($userTemp)) {
             die('This link has expired. Please try again');
         }
-        
+
         $email = $userTemp['Attributes']['Email'];
-        
     }
 
     function formLoginProcess() {
@@ -175,15 +187,11 @@ class Auth {
                 $error = 'Email is required...';
             } else if ($password == "") {
                 $error = 'Password is required';
-            } else if ($email != Config::adminEmail()) {
-                $error = 'E-mail is not correct';
-            } else if ($password != Config::adminPassword()) {
-                $error = 'Password is not correct';
             }
 
             if ($error == '') {
                 $_SESSION['is_logged'] = true;
-                redirect($_SERVER['PHP_SELF']);
+                redirect($this->loginSuccessfulRedirectUrl);
             }
         }
         // END: Submit
